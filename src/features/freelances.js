@@ -1,5 +1,7 @@
+import { createAction, createReducer } from '@reduxjs/toolkit';
 import produce from "immer";
 import { selectFreelances } from "../utils/selectors";
+
 
 const initialState = {
     status: 'void',
@@ -10,11 +12,11 @@ const initialState = {
 const FETCHING = 'freelances/fetching'
 const RESOLVED = 'freelances/resolved'
 const REJECTED = 'freelances/rejected'
- 
-const freelancesFetching = () => ({ type: FETCHING });
-const freelancesResolved = (data) => ({ type: RESOLVED, payload: data });
-const freelancesRejected = (error) => ({ type: REJECTED, payload: error });
 
+const freelancesFetching = createAction(FETCHING);
+const freelancesResolved = createAction(RESOLVED, (data)=>({payload : data}));
+const freelancesRejected = createAction(REJECTED);
+//const freelancesRejected = (error) => ({ type: REJECTED, payload: error });
 
 export async function fetchOrUpdateFreelances(store) {
     const status = selectFreelances(store.getState()).status
@@ -31,8 +33,44 @@ export async function fetchOrUpdateFreelances(store) {
     }
 }
 
+export default createReducer(initialState, builder => builder
+    .addCase(freelancesFetching, (draft, action)=>{
+        if (draft.status === 'void'){
+            draft.status = 'pending'
+            return
+        }
+        if (draft.status === 'rejected'){
+            draft.status = 'pending'
+            draft.error = null
+            return
+        }
+        if (draft.status === 'resolved'){
+            draft.status = 'updating'
+            return
+        }
+        return
+    })
+    .addCase(freelancesResolved, (draft, action)=>{
+        if (draft.status === "pending" || draft.status === "updating"){
+            draft.data = action.payload;
+            draft.status = 'resolved';
+            return
+        }
+        return
+    })
+    .addCase(freelancesRejected, (draft, action)=>{
+        if (draft.status === "pending" || draft.status === "updating"){
+            draft.data = null;
+            draft.error = action.payload;
+            draft.status = 'rejected';
+            return
+        }
+        return
+    })
 
-export function freelancesReducer (state = initialState, action){
+)
+
+/*export function freelancesReducer (state = initialState, action){
     return produce(state, draft => {
         switch (action.type) {
             case FETCHING : {
@@ -71,4 +109,4 @@ export function freelancesReducer (state = initialState, action){
             default : return;
         }
     })
-}
+}*/

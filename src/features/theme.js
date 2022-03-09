@@ -1,15 +1,25 @@
-export const DARK_MODE = "darkMode";
+import { createAction, createReducer } from '@reduxjs/toolkit'
 
+//export const DARK_MODE = "darkMode";
+ 
+export const darkModeAction = createAction("theme/toggle");
 
-export function darkModeAction() {
+/*export function darkModeAction() {
     return {
         type : DARK_MODE
     }
-}
+}*/
 
-export function themeReducer (state="light", action) {
+export default createReducer('light', (builder)=>{
+    return builder
+    .addCase(darkModeAction, (state)=>{
+        return state === 'light' ? 'dark' : 'light'
+    })
+})
 
-    if (action.type === DARK_MODE){
+/*export function themeReducer (state="light", action) {
+
+    if (action.type === darkModeAction.toString()){
         if(state === "light"){
             state = "dark"
             return state
@@ -24,7 +34,7 @@ export function themeReducer (state="light", action) {
         }
     }
     else return state
-}
+}*/
 
 
 /*import produce from "immer";

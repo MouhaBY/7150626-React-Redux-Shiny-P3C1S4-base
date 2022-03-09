@@ -13,7 +13,7 @@ import Footer from './components/Footer'
 import Error from './components/Error'
 import GlobalStyle from './utils/style/GlobalStyle'
 import { SurveyProvider } from './utils/context'
-import { store } from './utils/store';
+import store  from './utils/store';
 
 ReactDOM.render(
   <Provider store={store}>
