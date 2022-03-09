@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import { Provider }  from 'react-redux'
+import { QueryClientProvider, QueryClient } from 'react-query'
 
 import Home from './pages/Home'
 import Survey from './pages/Survey'
@@ -15,38 +16,42 @@ import GlobalStyle from './utils/style/GlobalStyle'
 import { SurveyProvider } from './utils/context'
 import store  from './utils/store';
 
+const queryClient = new QueryClient()
+
 ReactDOM.render(
-  <Provider store={store}>
-  <React.StrictMode>
-    <Router>
-        <SurveyProvider>
-          <GlobalStyle />
-          <Header />
-          <Switch>
-            <Route exact path="/">
-              <Home />
-            </Route>
-            <Route path="/survey/:questionNumber">
-              <Survey />
-            </Route>
-            <Route path="/results">
-              <Results />
-            </Route>
-            <Route path="/freelances">
-              <Freelances />
-            </Route>
-            <Route
-              path="/profile/:id"
-              render={(props) => <Profile {...props} />}
-            />
-            <Route path="*">
-              <Error />
-            </Route>
-          </Switch>
-          <Footer />
-        </SurveyProvider>
-    </Router>
-  </React.StrictMode>
-  </Provider>,
+  <QueryClientProvider client={queryClient}>
+    <Provider store={store}>
+      <React.StrictMode>
+        <Router>
+            <SurveyProvider>
+              <GlobalStyle />
+              <Header />
+              <Switch>
+                <Route exact path="/">
+                  <Home />
+                </Route>
+                <Route path="/survey/:questionNumber">
+                  <Survey />
+                </Route>
+                <Route path="/results">
+                  <Results />
+                </Route>
+                <Route path="/freelances">
+                  <Freelances />
+                </Route>
+                <Route
+                  path="/profile/:id"
+                  render={(props) => <Profile {...props} />}
+                />
+                <Route path="*">
+                  <Error />
+                </Route>
+              </Switch>
+              <Footer />
+            </SurveyProvider>
+        </Router>
+      </React.StrictMode>
+    </Provider>
+  </QueryClientProvider>,
   document.getElementById('root')
 )

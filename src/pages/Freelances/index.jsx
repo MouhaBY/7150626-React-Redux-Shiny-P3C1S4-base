@@ -4,10 +4,11 @@ import Card from '../../components/Card'
 import colors from '../../utils/style/colors'
 import { Loader } from '../../utils/style/Atoms'
 import { useSelector } from 'react-redux';
-import { selectFreelances, selectTheme } from '../../utils/selectors';
+import { /*selectFreelances,*/ selectTheme } from '../../utils/selectors';
 import { useStore } from 'react-redux'
 import { useEffect } from 'react'
 import { fetchOrUpdateFreelances } from '../../features/freelances'
+import { useQuery } from 'react-query'
 
 
 const CardsContainer = styled.div`
@@ -43,16 +44,30 @@ const LoaderWrapper = styled.div`
 function Freelances() {
   const store = useStore();
 
+  const { 
+    data, 
+    isLoading, 
+    error 
+    } = useQuery('freelances', async ()=>{
+    const response = await fetch('http://localhost:8000/freelances')
+    const data = await response.json()
+    return data
+  })
+
   useEffect(() => {
     fetchOrUpdateFreelances(store);
   }, [store]);
 
   const theme = useSelector(selectTheme())
-  const freelances = useSelector(selectFreelances())
+  //const freelances = useSelector(selectFreelances())
 
-  const isLoading = freelances.status === "void" || freelances.status === "pending"
+ //const isLoading = freelances.status === "void" || freelances.status === "pending"
 
-  if (freelances.status === 'rejected') {
+  /*if (freelances.status === 'rejected') {
+    return <span>Il y a un problème</span>
+  }*/
+
+  if (error === 'rejected') {
     return <span>Il y a un problème</span>
   }
 
@@ -68,7 +83,7 @@ function Freelances() {
         </LoaderWrapper>
       ) : (
         <CardsContainer>
-          {freelances.data.freelancersList?.map((profile) => (
+          {data.freelancersList?.map((profile) => (
             <Link key={`freelance-${profile.id}`} to={`/profile/${profile.id}`}>
               <Card
                 label={profile.job}
